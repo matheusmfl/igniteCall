@@ -40,6 +40,7 @@ model Account {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([provider, provider_account_id])
+  @@map("accounts")
 }
 
 model Session {
@@ -48,4 +49,6 @@ model Session {
   user_id       String
   expires       DateTime
   user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
