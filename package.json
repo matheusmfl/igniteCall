@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "studio": "npx prisma studio",
+    "prisma-migrate": "npx prisma migrate dev",
+    "prisma-init-sqlite": "npx prisma init --datasouce-provider SQLite"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.0.0",
@@ -19,6 +22,7 @@
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",
     "next": "13.2.4",
+    "nookies": "^2.5.2",
     "phosphor-react": "^1.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -28,6 +32,7 @@
   },
   "devDependencies": {
     "@rocketseat/eslint-config": "^1.2.0",
+    "@types/cookie": "^0.5.1",
     "prisma": "^4.12.0"
   }
 }
