@@ -39,11 +39,15 @@ export function PrismaAdapter(
     },
 
     async getUser(id) {
-      const user = await prisma.user.findUniqueOrThrow({
+      const user = await prisma.user.findUnique({
         where: {
           id,
         },
       })
+
+      if (!user) {
+        return null
+      }
 
       return {
         id: user.id,
@@ -55,11 +59,14 @@ export function PrismaAdapter(
       }
     },
     async getUserByEmail(email) {
-      const user = await prisma.user.findUniqueOrThrow({
+      const user = await prisma.user.findUnique({
         where: {
           email,
         },
       })
+      if (!user) {
+        return null
+      }
 
       return {
         id: user.id,
@@ -72,7 +79,7 @@ export function PrismaAdapter(
     },
     async getUserByAccount({ providerAccountId, provider }) {
       // só pode existir um unico ID de usuario para cada provider
-      const { user } = await prisma.account.findUniqueOrThrow({
+      const account = await prisma.account.findUnique({
         where: {
           provider_provider_account_id: {
             provider,
@@ -83,6 +90,12 @@ export function PrismaAdapter(
           user: true,
         },
       })
+
+      if (!account) {
+        return null
+      }
+
+      const { user } = account
       return {
         id: user.id,
         name: user.name,
@@ -146,7 +159,7 @@ export function PrismaAdapter(
       }
     },
     async getSessionAndUser(sessionToken) {
-      const { user, ...session } = await prisma.session.findUniqueOrThrow({
+      const prismaSession = await prisma.session.findUnique({
         where: {
           session_token: sessionToken,
         },
@@ -154,6 +167,10 @@ export function PrismaAdapter(
           user: true,
         },
       })
+      if (!prismaSession) {
+        return null
+      }
+      const { user, ...session } = prismaSession
       return {
         session: {
           userId: session.user_id,
