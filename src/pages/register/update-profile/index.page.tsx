@@ -1,60 +1,36 @@
-import { Button, Heading, MultiStep, Text, TextInput } from '@ignite-ui/react'
-import { Container, Form, Header, FormError } from './style'
+import { Button, Heading, MultiStep, Text, TextArea } from '@ignite-ui/react'
 import { ArrowRight } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { api } from '@/lib/axios'
-import { AxiosError } from 'axios'
+import { Container, Header } from '../style'
+import { FormAnnotation, ProfileBox } from './styles'
+import { GetServerSideProps } from 'next'
+import { getServerSession } from 'next-auth/next'
+import { buildNextAuthOptions } from '@/pages/api/auth/[...nextauth].api'
+import { useSession } from 'next-auth/react'
 
-const registerFormSchema = z.object({
-  username: z
-    .string()
-    .min(3, { message: 'Usuario muito pequeno' })
-    .regex(/^([a-z\\-]+)$/i, { message: 'Nome de usuário inválido' })
-    .transform((username) => username.toLowerCase()),
-  name: z
-    .string()
-    .min(3, { message: 'O nome precisa ter ao menos 3 caracteres' }),
+const UpdateProfileSchema = z.object({
+  bio: z.string(),
 })
 
-type RegisterFormData = z.infer<typeof registerFormSchema>
+type UpdateProfileData = z.infer<typeof UpdateProfileSchema>
 
-export default function Register() {
+export default function UpdateProfile() {
+  const session = useSession()
+
+  console.log(session)
+
   const {
     register,
     handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerFormSchema),
+
+    formState: { isSubmitting },
+  } = useForm<UpdateProfileData>({
+    resolver: zodResolver(UpdateProfileSchema),
   })
 
-  const router = useRouter()
-
-  useEffect(() => {
-    if (router.query.username) {
-      setValue('username', String(router.query.username))
-    }
-  }, [router.query?.username, setValue])
-
-  async function handleRegister(data: RegisterFormData) {
-    try {
-      await api.post('/users', {
-        name: data.name,
-        username: data.username,
-      })
-
-      await router.push('/register/connect-calendar')
-    } catch (error) {
-      if (error instanceof AxiosError && error?.response?.data?.message) {
-        alert(error.response.data.message)
-      }
-      console.error(error)
-    }
-  }
+  async function handleUpdateProfile(data: UpdateProfileData) {}
   return (
     <Container>
       <Header>
@@ -66,32 +42,38 @@ export default function Register() {
 
         <MultiStep size={4} currentStep={1} />
       </Header>
-      <Form as="form" onSubmit={handleSubmit(handleRegister)}>
+      <ProfileBox as="form" onSubmit={handleSubmit(handleUpdateProfile)}>
         <label>
-          <Text size="sm">Nome de usuário</Text>
-          <TextInput
-            prefix="ignite.com/"
-            placeholder="seu-usuario"
-            {...register('username')}
-          />
-          {errors.username && (
-            <FormError size="sm">{errors.username.message}</FormError>
-          )}
+          <Text size="sm">Foto de perfil</Text>
         </label>
 
         <label>
-          <Text size="sm">Nome completo</Text>
-          <TextInput placeholder="seu-nome" {...register('name')} />
-          {errors.name && (
-            <FormError size="sm">{errors.name.message}</FormError>
-          )}
+          <Text size="sm">Sobre você</Text>
+          <TextArea placeholder="seu-nome" {...register('bio')} />
+          <FormAnnotation size="sm">
+            Fale um pouco sobre você. Isto será exibido em sua página pessoal.
+          </FormAnnotation>
         </label>
 
         <Button type="submit" disabled={isSubmitting}>
-          Próximo passo
+          Finalizar
           <ArrowRight />
         </Button>
-      </Form>
+      </ProfileBox>
     </Container>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getServerSession(
+    req,
+    res,
+    buildNextAuthOptions(req, res),
+  )
+
+  return {
+    props: {
+      session,
+    },
+  }
 }
