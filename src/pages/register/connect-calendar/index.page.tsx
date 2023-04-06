@@ -60,7 +60,11 @@ export default function ConnectCalendar() {
             permissões de acesso ao Google Calendar
           </AuthError>
         )}
-        <Button type="submit" disabled={!isSignedIn}>
+        <Button
+          type="submit"
+          disabled={!isSignedIn}
+          onClick={() => router.push('/register/time-intervals')}
+        >
           Próximo passo
           <ArrowRight />
         </Button>
