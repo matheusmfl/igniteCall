@@ -1,4 +1,11 @@
-import { Button, Heading, MultiStep, Text, TextArea } from '@ignite-ui/react'
+import {
+  Avatar,
+  Button,
+  Heading,
+  MultiStep,
+  Text,
+  TextArea,
+} from '@ignite-ui/react'
 import { ArrowRight } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -9,6 +16,8 @@ import { GetServerSideProps } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { buildNextAuthOptions } from '@/pages/api/auth/[...nextauth].api'
 import { useSession } from 'next-auth/react'
+import { api } from '@/lib/axios'
+import { useRouter } from 'next/router'
 
 const UpdateProfileSchema = z.object({
   bio: z.string(),
@@ -18,8 +27,9 @@ type UpdateProfileData = z.infer<typeof UpdateProfileSchema>
 
 export default function UpdateProfile() {
   const session = useSession()
+  const router = useRouter()
 
-  console.log(session)
+  console.log(session.data?.user.avatar_url)
 
   const {
     register,
@@ -30,7 +40,13 @@ export default function UpdateProfile() {
     resolver: zodResolver(UpdateProfileSchema),
   })
 
-  async function handleUpdateProfile(data: UpdateProfileData) {}
+  async function handleUpdateProfile(data: UpdateProfileData) {
+    await api.put('/users/update-profile', {
+      bio: data.bio,
+    })
+    await router.push(`/schedule/${session.data?.user.username}`)
+  }
+
   return (
     <Container>
       <Header>
@@ -40,11 +56,12 @@ export default function UpdateProfile() {
           editar essas informações depois.
         </Text>
 
-        <MultiStep size={4} currentStep={1} />
+        <MultiStep size={4} currentStep={4} />
       </Header>
       <ProfileBox as="form" onSubmit={handleSubmit(handleUpdateProfile)}>
         <label>
           <Text size="sm">Foto de perfil</Text>
+          <Avatar src={session.data?.user.avatar_url} />
         </label>
 
         <label>
