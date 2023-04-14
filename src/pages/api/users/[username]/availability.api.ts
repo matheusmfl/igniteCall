@@ -73,5 +73,5 @@ export default async function handle(
     )
   })
 
-  return res.json({ possibleTimes, availableTimes, message: 'ola' })
+  return res.json({ possibleTimes, availableTimes })
 }
