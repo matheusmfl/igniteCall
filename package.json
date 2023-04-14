@@ -9,7 +9,8 @@
     "lint": "next lint",
     "studio": "npx prisma studio",
     "migrate-dev": "npx prisma migrate dev",
-    "prisma-init-sqlite": "npx prisma init --datasouce-provider SQLite"
+    "prisma-init-sqlite": "npx prisma init --datasouce-provider SQLite",
+    "docker": "docker run --name mysql -e MYSQL_ROOT_PASSWORD=docker -p 3306:3306 mysql:latest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.0.0",
