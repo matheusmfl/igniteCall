@@ -25,7 +25,7 @@ export default async function handle(
     return res.status(400).json({ message: 'User does not exists' })
   }
 
-  const availableWeekDays = await prisma.userTimerInterval.findMany({
+  const availableWeekDays = await prisma.userTimeInterval.findMany({
     select: {
       week_day: true,
     },
@@ -40,14 +40,14 @@ export default async function handle(
     )
   })
 
-  // const blockedDatesRaw = await prisma.$queryRaw`
-  // SELECT *
-  // FROM schedulings S
+  const blockedDatesRaw = await prisma.$queryRaw`
+  SELECT *
+  FROM schedulings S
 
-  // WHERE S.user_id = ${user.id}
-  //   AND DATE_FORMAT(S.date, "%Y-%m") = ${`${year}-${month}`}
+  WHERE S.user_id = ${user.id}
+    AND DATE_FORMAT(S.date, "%Y-%m") = ${`${year}-${month}`}
 
-  // `
+  `
 
-  return res.json({ blockedWeekDays })
+  return res.json({ blockedWeekDays, blockedDatesRaw })
 }

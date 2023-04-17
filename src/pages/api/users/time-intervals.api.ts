@@ -35,7 +35,7 @@ export default async function handler(
 
   const { intervals } = timeIntervalsBodySchema.parse(req.body)
 
-  await prisma.userTimerInterval.createMany({
+  await prisma.userTimeInterval.createMany({
     data: intervals.map((interval) => {
       return {
         week_day: interval.weekDay,
