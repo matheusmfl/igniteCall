@@ -18,7 +18,9 @@ export default async function handle(
   }
 
   const user = await prisma.user.findUnique({
-    where: { username },
+    where: {
+      username,
+    },
   })
 
   if (!user) {
@@ -43,7 +45,7 @@ export default async function handle(
     return res.json({ possibleTimes: [], availableTimes: [] })
   }
 
-  const { time_start_in_minutes, time_end_in_minutes } = userAvailability
+  const { time_end_in_minutes, time_start_in_minutes } = userAvailability
 
   const startHour = time_start_in_minutes / 60
   const endHour = time_end_in_minutes / 60
@@ -55,9 +57,7 @@ export default async function handle(
   )
 
   const blockedTimes = await prisma.scheduling.findMany({
-    select: {
-      date: true,
-    },
+    select: { date: true },
     where: {
       user_id: user.id,
       date: {
